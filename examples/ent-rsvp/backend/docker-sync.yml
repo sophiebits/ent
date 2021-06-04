@@ -1,0 +1,15 @@
+version: '2'
+syncs:
+  backend-docker-sync:
+    src: './'
+#    sync_excludes: ['.git', 'dist']
+    unison_image: 'eugenmayer/unison:2.51.3-4.12.0-ARM64'
+    compose-file-path: 'docker-compose.dev.yml'
+#    compose-dev-file-path: 'docker-compose.dev.sync.yml'
+    sync_strategy: 'unison'
+    verbose: false
+    cli_mode: 'auto'
+    max_attempt: 5
+
+
+

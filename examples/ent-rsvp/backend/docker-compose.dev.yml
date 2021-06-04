@@ -12,6 +12,13 @@ services:
       - 4000:4000
       - 9229:9229 # for debugger apparently
     volumes:
-      - .:/app:rw,delegated
+#      - .:/app:rw,delegated
+#    volumes:
+      - backend-docker-sync:/app:nocopy
+
     environment:
       - DB_CONNECTION_STRING=postgres://ola:@host.docker.internal/ent-rsvp
+
+volumes: 
+  backend-docker-sync:
+    external: true
