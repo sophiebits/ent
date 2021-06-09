@@ -44,8 +44,8 @@ describe("create event activity", () => {
       }).saveX();
       fail("should have thrown");
     } catch (e) {
-      expect(e.message).toBe(
-        "ent undefined is not visible for privacy reasons",
+      expect(e.message).toMatch(
+        /Viewer with ID (.+) does not have permission to create EventActivity/,
       );
     }
   });
@@ -151,7 +151,7 @@ describe("invites", () => {
       fail("should have thrown");
     } catch (e) {
       expect(e.message).toMatch(
-        /^ent (.+) is not visible for privacy reasons$/,
+        /Viewer with ID (.+) does not have permission to edit EventActivity/,
       );
     }
   });
@@ -212,7 +212,7 @@ describe("invites", () => {
       fail("should have thrown");
     } catch (e) {
       expect(e.message).toMatch(
-        /^ent (.+) is not visible for privacy reasons$/,
+        /Viewer with ID (.+) does not have permission to edit EventActivity/,
       );
     }
   });
@@ -546,5 +546,35 @@ describe("rsvps", () => {
         /^ent (.+) is not visible for privacy reasons$/,
       );
     }
+  });
+
+  test("non-saveXFromID API", async () => {
+    const [activity, guests] = await createAndInvitePlusGuests(0);
+    const guest = guests[0];
+    const vc = new IDViewer(guest.id);
+
+    const activity2 = await EditEventActivityRsvpStatusAction.create(
+      vc,
+      activity,
+      {
+        guestID: guest.id,
+        rsvpStatus: EventActivityRsvpStatusInput.Attending,
+      },
+    ).saveX();
+
+    const rsvpStatus = await activity2.viewerRsvpStatus();
+    expect(rsvpStatus).toBe(EventActivityRsvpStatus.Attending);
+
+    const activity3 = await EditEventActivityRsvpStatusAction.create(
+      vc,
+      activity,
+      {
+        guestID: guest.id,
+        rsvpStatus: EventActivityRsvpStatusInput.Declined,
+      },
+    ).saveX();
+
+    const rsvpStatus2 = await activity3.viewerRsvpStatus();
+    expect(rsvpStatus2).toBe(EventActivityRsvpStatus.Declined);
   });
 });
